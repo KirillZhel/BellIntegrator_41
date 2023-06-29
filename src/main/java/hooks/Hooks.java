@@ -47,8 +47,6 @@ public class Hooks {
         //заносим объект веб-драйвера в хранилище
         testContext.put(String.valueOf(Context.CHROMEDRIVER),driver);
         testContext.put(String.valueOf(Context.PROXY),proxy);
-        boolean a = TestContext.getInstance().contains(String.valueOf(Context.CHROMEDRIVER));
-        boolean b = TestContext.getInstance().contains(String.valueOf(Context.PROXY));
     }
 
     /**
@@ -57,10 +55,11 @@ public class Hooks {
     @After()
     public void quitWebDriver() {
         System.out.println("Завершение работы веб-драйвера");
-        boolean a = TestContext.getInstance().contains(String.valueOf(Context.CHROMEDRIVER));
         TestContext testContext = TestContext.getInstance();
-        ChromeDriver chromeDriver = (ChromeDriver) TestContext.getInstance().get(String.valueOf(Context.CHROMEDRIVER));
+        ChromeDriver chromeDriver = (ChromeDriver) testContext.get(String.valueOf(Context.CHROMEDRIVER));
         chromeDriver.quit();
+        BrowserUpProxyServer proxy = (BrowserUpProxyServer) testContext.get(Context.PROXY.name());
+        proxy.stop();
     }
 
     /**
@@ -81,7 +80,7 @@ public class Hooks {
     }
 
     /**
-     * Метод настроек web-драйвера после каждого теста.
+     * Метод настроек web-драйвера перед каждым тестом.
      * @author Кирилл Желтышев
      */
     private ChromeOptions getOptionsChrome(BrowserUpProxyServer proxy) {
