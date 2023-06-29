@@ -19,16 +19,20 @@ public class BaseSteps {
      * Хромдрайвер
      */
     public WebDriver driver;
+
     /**
      * Прокси
+     * @author Кирилл Желтышев
      */
     public BrowserUpProxyServer proxy;
 
+    /**
+     * Конструктор класса
+     * @author Кирилл Желтышев
+     */
     public BaseSteps() {
         this.testContext = TestContext.getInstance();
-        // драйвер берется из хранилища в классе контекста
         this.driver = (WebDriver) this.testContext.get(Context.CHROMEDRIVER.toString());
-        // прокси берётся из хранилища в классе контекста
         this.proxy = (BrowserUpProxyServer) this.testContext.get(Context.PROXY.toString());
     }
 

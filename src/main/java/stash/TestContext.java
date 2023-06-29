@@ -13,7 +13,7 @@ public class TestContext {
     private final Map<String, Object> stash;
 
     /**
-     * Инстранс класс
+     * Инстанс класс
      */
     private static TestContext INSTANCE;
 
@@ -22,8 +22,7 @@ public class TestContext {
     }
 
     /**
-     * Реализован паттерн SingleTon для содержания едиснтвенного,уникального объекта класса
-     * Это необходимо для обращения к единому хранилищу данных
+     * Метод, возвращающий единственный созданный объект класса
      */
     public static TestContext getInstance() {
         if (INSTANCE == null) {
@@ -42,6 +41,11 @@ public class TestContext {
         stash.put(key, value);
     }
 
+    /**
+     * Метод, возвращающий объект из хранилища по ключу
+     * @param key ключ
+     * @return объект
+     */
     public Object get(String key) {
         return stash.get(key);
     }

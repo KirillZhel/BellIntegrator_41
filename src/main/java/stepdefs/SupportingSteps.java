@@ -4,6 +4,7 @@ import com.browserup.bup.BrowserUpProxyServer;
 import com.browserup.harreader.model.Har;
 import com.browserup.harreader.model.HarEntry;
 import com.jayway.jsonpath.JsonPath;
+import io.qameta.allure.Step;
 import models.SearchResultsInfo;
 import models.Snippet;
 import pages.YandexMarketCategoryPage;
@@ -19,7 +20,13 @@ import java.util.stream.Collectors;
 import static helpers.WaitUtils.waitForState;
 
 public class SupportingSteps {
-    public static void getSnippetsFromCurrentPage() {
+    /**
+     * Метод, который собирает карточки товаров и сохраняет их в хранилище.
+     * @author Кирилл Желтышев
+     * @return Список всех карточек товаров на странице
+     */
+    @Step("Собираем все карточки предложенных товаров и сохраняем в хранилище.")
+    public static void getSnippetsFromCurrentPageAndSaveToStash() {
         TestContext testContext = TestContext.getInstance();
         YandexMarketCategoryPage yandexMarketCategoryPage = (YandexMarketCategoryPage) testContext.get(Context.YANDEX_MARKET_CATEGORY_PAGE.name());
         List<Snippet> snippets = yandexMarketCategoryPage.getAllSnippetFromPage();
@@ -31,6 +38,7 @@ public class SupportingSteps {
      * @author Кирилл Желтышев
      * @return Объект, который содержит в себе дополнительную информацию.
      */
+    @Step("Берём дополнительную информацию из результата запроса.")
     public static SearchResultsInfo getSearchResultsInfo(BrowserUpProxyServer proxy) {
         waitForState(() -> getMostRecentHarEntryForSearchRequest(proxy.getHar()),
                 harEntry -> harEntry
@@ -47,6 +55,7 @@ public class SupportingSteps {
      * @param har Файл har
      * @return запись Har
      */
+    @Step("Берём из Har определённые записи.")
     public static HarEntry getMostRecentHarEntryForSearchRequest(Har har) {
         Optional<HarEntry> mostRecentEntry = har.getLog().findMostRecentEntry(Pattern.compile(".*search/resolveRemoteSearch.*"));
         return mostRecentEntry
@@ -59,6 +68,7 @@ public class SupportingSteps {
      * @param har Файл har
      * @return Дополнительная информация запроса
      */
+    @Step("Берём из Har определённые значения.")
     public static SearchResultsInfo extractLatestSearchResultsResponse(Har har) {
         HarEntry mostRecentEntry = getMostRecentHarEntryForSearchRequest(har);
         String rawJson = mostRecentEntry.getResponse().getContent().getText();
@@ -84,6 +94,7 @@ public class SupportingSteps {
      * @param maxPrice Максимальная цена
      * @return true - в случае, если все товары на странице соответствуют фильтрам, false - если не соответствуют
      */
+    @Step("Проверяем на соответствие карточки предложенных товаров фильтру.")
     public static boolean areAllSnippetOnPageMatchTheFilter(List<Snippet> snippets, List<String> manufacturers, int minPrice, int maxPrice) {
         return areAllSnippetsContainsAnyStringInName(snippets, manufacturers)
                 && areAllSnippetsHaveCurrentPrice(snippets, minPrice, maxPrice);
@@ -97,6 +108,7 @@ public class SupportingSteps {
      * @param maxPrice Максимальная цена
      * @return true - в случае, если все товары на странице соответствуют фильтру, false - если не соответствуют
      */
+    @Step("Проверяем все карточки товаров на странице на соответствие цене (от {minPrice} до {maxPrice}).")
     public static boolean areAllSnippetsHaveCurrentPrice(List<Snippet> snippets, int minPrice, int maxPrice) {
         return snippets.stream().allMatch(snippet -> snippet.price >= minPrice && snippet.price <= maxPrice);
     }
@@ -108,6 +120,7 @@ public class SupportingSteps {
      * @param strings Список строк
      * @return true - в случае, если все товары на странице соответствуют фильтру, false - если не соответствуют
      */
+    @Step("Проверяем все карточки товаров на странице на соответствие производителю.")
     public static boolean areAllSnippetsContainsAnyStringInName(List<Snippet> snippets, List<String> strings) {
         return snippets.stream()
                 .map(snippet -> snippet.name.toLowerCase())
@@ -122,6 +135,7 @@ public class SupportingSteps {
      * @param snippetForSearch Искомая карточка
      * @return true - если удалось найти товар, false - если товар не удалось найти
      */
+    @Step("Определяем, есть ли в предложенных карточках товар искомый товар.")
     public static boolean isProductPresentOnPage(List<Snippet> snippets, Snippet snippetForSearch) {
         List<Snippet> filtredSnippet = snippets.stream()
                 .filter(snippet -> snippet.name.equalsIgnoreCase(snippetForSearch.name))

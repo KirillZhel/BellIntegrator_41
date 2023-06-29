@@ -21,17 +21,17 @@ import java.time.Duration;
 
 /**
  * Класс задает методы, которые могут выполняться в различных точках цикла выполнения Cucumber.
- * Обычно они используются для настройки и демонтажа среды до и после каждого сценария
+ * @author Кирилл Желтышев
  */
 public class Hooks {
 
     /**
-     * Инициализация и настройка драйвера
-     * value указывает, для каких тегов выполнить метод
+     * Инициализация и настройка драйвера и прокси перед тестом
+     * @author Кирилл Желтышев
      */
     @Before()
     public void initializeWebDriver(){
-        System.out.println("Инициализация веб-драйвера");
+        System.out.println("Инициализация веб-драйвера и прокси");
 
         BrowserUpProxyServer proxy = new BrowserUpProxyServer();
         proxy.start(0);
@@ -44,20 +44,23 @@ public class Hooks {
         driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
 
-        //заносим объект веб-драйвера в хранилище
         testContext.put(String.valueOf(Context.CHROMEDRIVER),driver);
         testContext.put(String.valueOf(Context.PROXY),proxy);
     }
 
     /**
-     * Завершение работы драйвера
+     * Завершение работы драйвера и прокси
+     * @author Кирилл Желтышев
      */
     @After()
     public void quitWebDriver() {
-        System.out.println("Завершение работы веб-драйвера");
+        System.out.println("Завершение работы веб-драйвера и прокси");
+
         TestContext testContext = TestContext.getInstance();
+
         ChromeDriver chromeDriver = (ChromeDriver) testContext.get(String.valueOf(Context.CHROMEDRIVER));
         chromeDriver.quit();
+
         BrowserUpProxyServer proxy = (BrowserUpProxyServer) testContext.get(Context.PROXY.name());
         proxy.stop();
     }
@@ -65,7 +68,6 @@ public class Hooks {
     /**
      * Получение методанных сценария по завершении теста
      * @param scenario - объект метаданных сценария
-     * отсутствие тега после @Before говорит о том, что метод применяется ко всем тестам
      */
     @Before
     public void getScenarioInfo(Scenario scenario) {
