@@ -88,12 +88,12 @@
             <version>${junit.jupiter.version}</version>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>RELEASE</version>
             <scope>test</scope>
-        </dependency>
+        </dependency>-->
 
         <!-- Для пропертей -->
         <dependency>
@@ -186,6 +186,8 @@
                 <configuration>
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                        -Dcucumber.options="--plugin io.qameta.allure.cucumber5jvm.AllureCucumber5Jvm"
+                        <!-- -Dcucumber.options="-p pretty -p io.qameta.allure.cucumberjvm.AllureCucumberJvm"-->
                     </argLine>
                 </configuration>
                 <dependencies>

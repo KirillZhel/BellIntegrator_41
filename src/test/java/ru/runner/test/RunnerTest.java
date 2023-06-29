@@ -9,9 +9,10 @@ import org.junit.runner.RunWith;
         features = "src/test/java/features",
         glue = {"stepdefs", "hooks"},
         plugin = {"pretty", "io.qameta.allure.cucumber5jvm.AllureCucumber5Jvm", "json:target/cucumber-report/report.json"},
-        tags = "@all",
-        dryRun = false,
-        strict = false,
+        //plugin = {"pretty", "io.qameta.allure.cucumber5jvm.AllureCucumber5Jvm"},
+        //tags = "@all",
+        //dryRun = false,
+        //strict = true,
         snippets = CucumberOptions.SnippetType.CAMELCASE
 )
 public class RunnerTest {
