@@ -51,14 +51,23 @@ public class MyStepDef extends BaseSteps {
     }
 
     /**
-     * Метод, реализующий шаг в котором происходит установка фильтра товаров по цене
+     * Метод, реализующий шаг в котором происходит установка фильтра товаров по минимальной цене
      * @author Кирилл Желтышев
      */
-    @Когда("пользователь фильтрует товары по цене от {int} до {int}")
-    public void пользовательФильтруетТоварыПоЦене(Integer minPriceForFilter, Integer maxPriceForFilter) {
+    @Когда("пользователь фильтрует товары по цене от {int}")
+    public void пользовательФильтруетТоварыПоМинимальнойЦене(Integer minPriceForFilter) {
         YandexMarketCategoryPage yandexMarketCategoryPage = (YandexMarketCategoryPage) testContext.get(Context.YANDEX_MARKET_CATEGORY_PAGE.name());
         yandexMarketCategoryPage.getPriceFilter().setMinPrice(minPriceForFilter);
         testContext.put(Context.MIN_PRICE.name(), minPriceForFilter);
+    }
+
+    /**
+     * Метод, реализующий шаг в котором происходит установка фильтра товаров по максимальной цене
+     * @author Кирилл Желтышев
+     */
+    @Когда("пользователь фильтрует товары по цене до {int}")
+    public void пользовательФильтруетТоварыПоМаксимальнойЦене(Integer maxPriceForFilter) {
+        YandexMarketCategoryPage yandexMarketCategoryPage = (YandexMarketCategoryPage) testContext.get(Context.YANDEX_MARKET_CATEGORY_PAGE.name());
         yandexMarketCategoryPage.getPriceFilter().setMaxPrice(maxPriceForFilter);
         testContext.put(Context.MAX_PRICE.name(), maxPriceForFilter);
     }
@@ -73,7 +82,14 @@ public class MyStepDef extends BaseSteps {
         yandexMarketCategoryPage.getManufacturerFilter().clickShowAllButton();
         yandexMarketCategoryPage.getManufacturerFilter().chooseManufacturers(manufacturersForFilter);
         testContext.put(Context.MANUFACTURERS.name(), manufacturersForFilter);
+    }
 
+    /**
+     * Метод, реализующий шаг в котором происходит получение дополнительной информации: общее количество товаров, количество товаров на странице, количество страниц, номер текущей страницы
+     * @author Кирилл Желтышев
+     */
+    @Когда("пользователь получает дополнительную информацию из HAR")
+    public void пользовательПолучаетДополнительнуюИнформациюИзHAR() {
         SearchResultsInfo info = getSearchResultsInfo(proxy);
         testContext.put(Context.INFO.name(), info);
     }
@@ -104,12 +120,18 @@ public class MyStepDef extends BaseSteps {
     @То("на странице все элементы удовлетворяют условиям фильтра")
     public void наСтраницеВсеЭлементыУдовлетворяютУсловиямФильтра() {
         List<Snippet> snippets = (List<Snippet>) testContext.get(Context.SNIPPETS.name());
-        Assertions.assertTrue(areAllSnippetOnPageMatchTheFilter(
+        Assertions.assertTrue(areAllSnippetsHaveCurrentMinPrice(
                         snippets,
-                        (List<String>) testContext.get(Context.MANUFACTURERS.name()),
-                        (int) testContext.get(Context.MIN_PRICE.name()),
+                        (int) testContext.get(Context.MIN_PRICE.name())),
+                "Не все предложения на странице соответствуют фильтру минимальной цены.");
+        Assertions.assertTrue(areAllSnippetsHaveCurrentMaxPrice(
+                        snippets,
                         (int) testContext.get(Context.MAX_PRICE.name())),
-                "Не все предложения на странице соответствуют фильтру.");
+                "Не все предложения на странице соответствуют фильтру максимальной цены.");
+        Assertions.assertTrue(areAllSnippetsContainsAnyStringInName(
+                        snippets,
+                        (List<String>) testContext.get(Context.MANUFACTURERS.name())),
+                "Не все предложения на странице соответствуют фильтру производителей.");
     }
 
     /**
@@ -119,7 +141,7 @@ public class MyStepDef extends BaseSteps {
     @Когда("пользователь просматривает случайную страницу")
     public void пользовательПросматриваетСлучайнуюСтраницу() {
         YandexMarketCategoryPage yandexMarketCategoryPage = (YandexMarketCategoryPage) testContext.get(Context.YANDEX_MARKET_CATEGORY_PAGE.name());
-        int randomPage = yandexMarketCategoryPage.goToRandomPage(
+        yandexMarketCategoryPage.goToRandomPage(
                 (SearchResultsInfo) testContext.get(Context.INFO.name()));
         getSnippetsFromCurrentPageAndSaveToStash();
     }
@@ -133,7 +155,7 @@ public class MyStepDef extends BaseSteps {
         System.out.println("пользователь_просматривает_последнюю_страницу");
 
         YandexMarketCategoryPage yandexMarketCategoryPage = (YandexMarketCategoryPage) testContext.get(Context.YANDEX_MARKET_CATEGORY_PAGE.name());
-        int randomPage = yandexMarketCategoryPage.goToLastPage(
+        yandexMarketCategoryPage.goToLastPage(
                 (SearchResultsInfo) testContext.get(Context.INFO.name()));
         getSnippetsFromCurrentPageAndSaveToStash();
     }

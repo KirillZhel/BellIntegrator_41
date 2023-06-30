@@ -23,7 +23,6 @@ public class SupportingSteps {
     /**
      * Метод, который собирает карточки товаров и сохраняет их в хранилище.
      * @author Кирилл Желтышев
-     * @return Список всех карточек товаров на странице
      */
     @Step("Собираем все карточки предложенных товаров и сохраняем в хранилище.")
     public static void getSnippetsFromCurrentPageAndSaveToStash() {
@@ -86,31 +85,27 @@ public class SupportingSteps {
     }
 
     /**
-     * Метод проверки карточек товаров на странице на соответствие фильтрам.
+     * Метод проверки товаров на соответствие минимальной цене.
      * @author Кирилл Желтышев
      * @param snippets Список карточки товаров
-     * @param manufacturers Список производителей, отмеченных в фильтре
-     * @param minPrice Минимальная цена
-     * @param maxPrice Максимальная цена
-     * @return true - в случае, если все товары на странице соответствуют фильтрам, false - если не соответствуют
+     * @param minPrice Минимальная цене
+     * @return true - в случае, если все товары на странице соответствуют фильтру, false - если не соответствуют
      */
-    @Step("Проверяем на соответствие карточки предложенных товаров фильтру.")
-    public static boolean areAllSnippetOnPageMatchTheFilter(List<Snippet> snippets, List<String> manufacturers, int minPrice, int maxPrice) {
-        return areAllSnippetsContainsAnyStringInName(snippets, manufacturers)
-                && areAllSnippetsHaveCurrentPrice(snippets, minPrice, maxPrice);
+    @Step("Проверяем все карточки товаров на странице на соответствие минимальной цене (от {minPrice}).")
+    public static boolean areAllSnippetsHaveCurrentMinPrice(List<Snippet> snippets, int minPrice) {
+        return snippets.stream().allMatch(snippet -> snippet.price >= minPrice);
     }
 
     /**
-     * Метод проверки товаров на соответствие цене.
+     * Метод проверки товаров на соответствие максимальной цене.
      * @author Кирилл Желтышев
      * @param snippets Список карточки товаров
-     * @param minPrice Минимальная цена
      * @param maxPrice Максимальная цена
      * @return true - в случае, если все товары на странице соответствуют фильтру, false - если не соответствуют
      */
-    @Step("Проверяем все карточки товаров на странице на соответствие цене (от {minPrice} до {maxPrice}).")
-    public static boolean areAllSnippetsHaveCurrentPrice(List<Snippet> snippets, int minPrice, int maxPrice) {
-        return snippets.stream().allMatch(snippet -> snippet.price >= minPrice && snippet.price <= maxPrice);
+    @Step("Проверяем все карточки товаров на странице на соответствие максимальной цене (до {maxPrice}).")
+    public static boolean areAllSnippetsHaveCurrentMaxPrice(List<Snippet> snippets, int maxPrice) {
+        return snippets.stream().allMatch(snippet -> snippet.price <= maxPrice);
     }
 
     /**
